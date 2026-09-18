@@ -85,3 +85,9 @@
     padding: 0.85rem;
   }
 }
+
+.cf-done > .cf-close-note {
+  color: var(--cf-ink-900);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}

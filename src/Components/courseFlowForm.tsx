@@ -15,7 +15,12 @@ import { SUBMIT_WEBHOOK_URL } from '../lib/config.ts';
 import { getCollege } from '../lib/majors.ts';
 import { initialState } from '../lib/formState.ts';
 import { computeErrors } from '../lib/validation.ts';
-import { extractRespondUrl, normalizePlan, postJson } from '../lib/plan.ts';
+import {
+  extractRespondUrl,
+  isApprovalConfirmed,
+  normalizePlan,
+  postJson,
+} from '../lib/plan.ts';
 import type {
   FieldErrors,
   FileKey,
@@ -227,7 +232,8 @@ export default function CourseFlowForm() {
     setErrorMessage(null);
 
     try {
-      // Multipart because the two uploaded documents are real files.
+      // Multipart because the study plan is uploaded as a real file.
+      // Course offerings are no longer uploaded; n8n reads them from Google Sheets.
       const payload = new FormData();
 
       payload.append('action', 'submit');
@@ -260,14 +266,6 @@ export default function CourseFlowForm() {
           'studyPlan',
           form.studyPlanFile,
           form.studyPlanFile.name,
-        );
-      }
-
-      if (form.courseOfferingsFile) {
-        payload.append(
-          'courseOfferings',
-          form.courseOfferingsFile,
-          form.courseOfferingsFile.name,
         );
       }
 
@@ -439,6 +437,18 @@ export default function CourseFlowForm() {
 
       if (!response.ok) {
         throw new Error(`Webhook responded with status ${response.status}`);
+      }
+
+      // Only show the approved screen once n8n confirms the plan was
+      // forwarded to the advisor:
+      //
+      // { "status": "sent_to_advisor" }
+      const data: unknown = await response.json().catch(() => null);
+
+      if (!isApprovalConfirmed(data)) {
+        throw new Error(
+          'The workflow did not confirm that your plan was sent to your advisor. Please try again.',
+        );
       }
 
       setPhase('approved');

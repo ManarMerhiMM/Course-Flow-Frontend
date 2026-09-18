@@ -11,7 +11,6 @@ export interface FormState {
   semester: string;
   year: string;
   studyPlanFile: File | null;
-  courseOfferingsFile: File | null;
   email: string;
   advisorEmail: string;
   courses: string[];
@@ -23,7 +22,7 @@ export interface FormState {
 export type FieldErrors = Partial<Record<keyof FormState, string>>;
 export type Touched = Partial<Record<keyof FormState, boolean>>;
 
-export type FileKey = 'studyPlanFile' | 'courseOfferingsFile';
+export type FileKey = 'studyPlanFile';
 export type ToggleKey = 'preferredTimes' | 'daysToAvoid';
 
 export type SetField = <K extends keyof FormState>(

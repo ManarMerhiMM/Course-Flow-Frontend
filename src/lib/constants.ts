@@ -1,7 +1,7 @@
 export const DEGREE_TRACKS = ['Bachelor', 'Master'] as const;
 export const SEMESTERS = ['Fall', 'Spring', 'Summer'] as const;
 export const TIME_BLOCKS = ['Morning', 'Afternoon'] as const;
-export const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+export const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] as const;
 
 // ---------------------------------------------------------------------------
 // Review reasons

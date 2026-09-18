@@ -29,10 +29,12 @@ export default function ApprovedScreen({
 
           <h2>Your plan is now with your advisor.</h2>
 
-          <p>
-            The schedule below is the plan you approved and sent. You will be
-            emailed once your advisor responds.
+          <p className="cf-close-note">
+            You will be notified by email when the advisor responds, you can
+            close this.
           </p>
+
+          <p>The schedule below is the plan you approved and sent.</p>
 
           <div className="cf-sent-plan">
             <SectionHeader num="01" title="Sent schedule" />

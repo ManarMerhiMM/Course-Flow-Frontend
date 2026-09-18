@@ -9,7 +9,6 @@ export const initialState: FormState = {
   semester: '',
   year: '',
   studyPlanFile: null,
-  courseOfferingsFile: null,
   email: '',
   advisorEmail: '',
   courses: [],

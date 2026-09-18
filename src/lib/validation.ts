@@ -6,16 +6,15 @@ import type { FieldErrors, FormState } from './types.ts';
 
 const STUDENT_EMAIL_RE = /^[^\s@]+@students\.rhu\.edu\.lb$/i;
 
-// const ADVISOR_EMAIL_RE = /^[^\s@]+@rhu\.edu\.lb$/i;
+const ADVISOR_EMAIL_RE = /^[^\s@]+@rhu\.edu\.lb$/i;
 
-const ADVISOR_EMAIL_RE = /^[^\s@]+@students\.rhu\.edu\.lb$/i;
 
-// Documents may only be PDF or Word (.docx).
-const ALLOWED_DOCUMENT_EXTENSIONS = ['.pdf', '.docx'];
+// The study plan must be an Excel file (read in n8n with Extract from File).
+export const ALLOWED_STUDY_PLAN_EXTENSIONS = ['.xlsx', '.xls'];
 
-function isAllowedDocument(file: File): boolean {
+function isExcelFile(file: File): boolean {
   const name = file.name.toLowerCase();
-  return ALLOWED_DOCUMENT_EXTENSIONS.some((ext) => name.endsWith(ext));
+  return ALLOWED_STUDY_PLAN_EXTENSIONS.some((ext) => name.endsWith(ext));
 }
 
 export function computeErrors(f: FormState): FieldErrors {
@@ -59,14 +58,8 @@ export function computeErrors(f: FormState): FieldErrors {
 
   if (!f.studyPlanFile) {
     next.studyPlanFile = 'Upload your study plan.';
-  } else if (!isAllowedDocument(f.studyPlanFile)) {
-    next.studyPlanFile = 'Upload a PDF or Word (.docx) file.';
-  }
-
-  if (!f.courseOfferingsFile) {
-    next.courseOfferingsFile = 'Upload the course offerings document.';
-  } else if (!isAllowedDocument(f.courseOfferingsFile)) {
-    next.courseOfferingsFile = 'Upload a PDF or Word (.docx) file.';
+  } else if (!isExcelFile(f.studyPlanFile)) {
+    next.studyPlanFile = 'Upload an Excel file (.xlsx or .xls).';
   }
 
   if (!f.email.trim()) {
@@ -78,7 +71,7 @@ export function computeErrors(f: FormState): FieldErrors {
   if (!f.advisorEmail.trim()) {
     next.advisorEmail = "Enter your advisor's email.";
   } else if (!ADVISOR_EMAIL_RE.test(f.advisorEmail.trim())) {
-    next.advisorEmail = 'Must end in @students.rhu.edu.lb';
+    next.advisorEmail = 'Must end in @rhu.edu.lb';
   }
 
   return next;

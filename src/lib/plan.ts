@@ -50,3 +50,16 @@ export async function postJson(url: string, body: unknown): Promise<Response> {
     body: JSON.stringify(body),
   });
 }
+
+// n8n confirms an approval with:
+//
+// { "status": "sent_to_advisor" }
+//
+// (the "Respond to Student (Approved)" node). Anything else means the
+// plan was NOT forwarded to the advisor.
+export const APPROVAL_CONFIRMED_STATUS = 'sent_to_advisor';
+
+export function isApprovalConfirmed(data: unknown): boolean {
+  const raw = (data ?? {}) as Record<string, unknown>;
+  return raw.status === APPROVAL_CONFIRMED_STATUS;
+}
