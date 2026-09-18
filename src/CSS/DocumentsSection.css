@@ -1,0 +1,24 @@
+.cf-input[type='file'] {
+  padding: 0.5rem 0.6rem;
+}
+
+.cf-input[type='file']::file-selector-button {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  margin-right: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--cf-purple-700);
+  background: var(--cf-paper);
+  color: var(--cf-purple-700);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.cf-input[type='file']::file-selector-button:hover {
+  background: var(--cf-purple-700);
+  color: #fff;
+}

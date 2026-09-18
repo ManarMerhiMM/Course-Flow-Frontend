@@ -1,0 +1,3 @@
+/* CoursesSection currently uses only shared primitives
+   (.cf-course-input-row, .cf-add-btn, .cf-chip*) from courseFlowForm.css —
+   they are shared with PreferencesSection. Add section-specific styles here. */

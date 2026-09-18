@@ -1,0 +1,21 @@
+.cf-wordmark {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0 0 1.1rem;
+}
+
+.cf-wordmark-mark {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.62);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.cf-wordmark-name {
+  font-size: 1.3rem;
+}

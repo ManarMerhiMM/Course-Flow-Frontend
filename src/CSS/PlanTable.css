@@ -1,0 +1,44 @@
+.cf-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--cf-line);
+  border-radius: 4px;
+  margin-bottom: 0.9rem;
+}
+
+.cf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+}
+
+.cf-table th {
+  background: var(--cf-purple-700);
+  color: #fff;
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cf-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--cf-line);
+  white-space: nowrap;
+}
+
+.cf-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cf-table-empty {
+  text-align: center;
+  color: var(--cf-ink-600);
+  padding: 1.2rem !important;
+}
+
+.cf-total-credits {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--cf-ink-900);
+  margin: 0 0 1.2rem;
+}

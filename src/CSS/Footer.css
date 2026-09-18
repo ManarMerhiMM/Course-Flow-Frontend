@@ -1,0 +1,41 @@
+/* Closes the page with the same deep purple the hero opens with,
+   so every screen is bookended by the brand color. */
+
+.cf-footer {
+  background: var(--cf-purple-950);
+  color: rgba(255, 255, 255, 0.72);
+  padding: 2rem 1.5rem;
+  border-top: 2px solid var(--cf-purple-700);
+}
+
+.cf-footer-inner {
+  max-width: 46rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cf-footer .cf-wordmark {
+  color: #fff;
+  margin: 0 0 0.25rem;
+}
+
+.cf-footer-text {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  max-width: 34rem;
+}
+
+.cf-footer-copy {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 600px) {
+  .cf-footer {
+    padding: 1.75rem 1.25rem;
+  }
+}

@@ -1,0 +1,7 @@
+/* The major select stays disabled until a degree track is picked. */
+
+.cf-select:disabled {
+  background: var(--cf-purple-100);
+  color: var(--cf-ink-600);
+  cursor: not-allowed;
+}

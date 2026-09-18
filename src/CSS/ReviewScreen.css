@@ -1,0 +1,127 @@
+.cf-decision-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.cf-decision-btn,
+.cf-disapprove-card {
+  border-radius: 6px;
+  padding: 1.15rem;
+}
+
+.cf-decision-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  width: 100%;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid var(--cf-purple-700);
+  background: var(--cf-paper);
+  color: var(--cf-ink-900);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.cf-decision-btn:hover:not(:disabled) {
+  background: var(--cf-purple-100);
+  transform: translateY(-1px);
+}
+
+.cf-decision-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.cf-decision-btn strong,
+.cf-disapprove-card strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.cf-decision-btn small,
+.cf-disapprove-card small {
+  display: block;
+  color: var(--cf-ink-600);
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.cf-decision-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  border-radius: 50%;
+  background: var(--cf-purple-100);
+  color: var(--cf-purple-700);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.cf-disapprove-card {
+  border: 1px solid var(--cf-line);
+  background: #faf8fb;
+}
+
+.cf-disapprove-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.cf-reason-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.cf-reason-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.cf-reason-option:hover {
+  border-color: var(--cf-line);
+  background: var(--cf-paper);
+}
+
+.cf-reason-option--selected {
+  border-color: var(--cf-purple-700);
+  background: var(--cf-purple-100);
+}
+
+.cf-reason-option input {
+  margin-top: 0.18rem;
+  accent-color: var(--cf-purple-700);
+}
+
+/* Must load after courseFlowForm.css so it overrides .cf-field's margin. */
+.cf-other-reason {
+  margin-top: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.cf-request-btn {
+  min-height: 2.6rem;
+  margin-top: 1rem;
+}

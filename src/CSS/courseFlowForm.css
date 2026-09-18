@@ -1,0 +1,243 @@
+/* ==========================================================================
+   Course Flow — base
+   Design tokens + shared primitives used by more than one component
+   (layout, fields, inputs, chips, add button, submit row).
+   Component-specific styles live in their own files in this folder.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap');
+
+.cf {
+  --cf-purple-950: #2e0e38;
+  --cf-purple-800: #4b1350;
+  --cf-purple-700: #6b2382;
+  --cf-purple-600: #7f35a0;
+  --cf-purple-100: #f3edf6;
+
+  --cf-ink-900: #17151a;
+  --cf-ink-600: #55505c;
+
+  --cf-line: #e4dcea;
+  --cf-paper: #ffffff;
+
+  --cf-success: #1f7a4d;
+  --cf-success-bg: #eaf6ef;
+
+  --cf-error: #b3261e;
+  --cf-error-bg: #fbebe9;
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--cf-ink-900);
+  background: var(--cf-paper);
+  min-height: 100vh;
+}
+
+.cf * {
+  box-sizing: border-box;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Layout */
+/* -------------------------------------------------------------------------- */
+
+.cf-main {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+}
+
+.cf-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem 1.25rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Fields */
+/* -------------------------------------------------------------------------- */
+
+.cf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+
+.cf-field--full {
+  grid-column: 1 / -1;
+}
+
+.cf-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--cf-ink-900);
+}
+
+.cf-label-optional {
+  color: var(--cf-ink-600);
+  font-weight: 400;
+}
+
+.cf-input,
+.cf-select,
+.cf-textarea {
+  font-family: inherit;
+  font-size: 0.98rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--cf-line);
+  border-radius: 4px;
+  background: var(--cf-paper);
+  color: var(--cf-ink-900);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.cf-input:focus,
+.cf-select:focus,
+.cf-textarea:focus {
+  outline: none;
+  border-color: var(--cf-purple-700);
+  box-shadow: 0 0 0 3px rgba(107, 35, 130, 0.12);
+}
+
+.cf-input--error,
+.cf-select--error,
+.cf-textarea--error {
+  border-color: var(--cf-error);
+}
+
+.cf-textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+}
+
+.cf-error-text {
+  font-size: 0.82rem;
+  color: var(--cf-error);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Input + Add button row, chips (Courses, Preferences, Documents) */
+/* -------------------------------------------------------------------------- */
+
+.cf-course-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cf-course-input-row .cf-input {
+  flex: 1;
+}
+
+.cf-add-btn {
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0 1rem;
+  border-radius: 4px;
+  border: 1px solid var(--cf-purple-700);
+  background: var(--cf-paper);
+  color: var(--cf-purple-700);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.cf-add-btn:hover:not(:disabled) {
+  background: var(--cf-purple-700);
+  color: #fff;
+}
+
+.cf-add-btn:disabled {
+  border-color: var(--cf-line);
+  color: var(--cf-ink-600);
+  cursor: not-allowed;
+}
+
+.cf-add-btn:disabled:hover {
+  background: var(--cf-paper);
+}
+
+.cf-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.cf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem 0.35rem 0.75rem;
+  background: var(--cf-purple-100);
+  color: var(--cf-purple-800);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.cf-chip-remove {
+  background: none;
+  border: none;
+  color: var(--cf-purple-700);
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 0.1rem 0.2rem;
+}
+
+.cf-chip-remove:hover {
+  color: var(--cf-error);
+}
+
+.cf-empty-note {
+  font-size: 0.85rem;
+  color: var(--cf-ink-600);
+  margin-top: 0.5rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Submit row (form + review screens) */
+/* -------------------------------------------------------------------------- */
+
+.cf-submit-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.cf-submit-note {
+  font-size: 0.85rem;
+  color: var(--cf-ink-600);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Mobile */
+/* -------------------------------------------------------------------------- */
+
+@media (max-width: 600px) {
+  .cf-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-main {
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  .cf-submit-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cf-course-input-row {
+    flex-direction: column;
+  }
+
+  .cf-course-input-row .cf-add-btn {
+    min-height: 2.6rem;
+  }
+}

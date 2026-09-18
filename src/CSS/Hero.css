@@ -1,0 +1,58 @@
+.cf-hero {
+  background: linear-gradient(
+    160deg,
+    var(--cf-purple-950) 0%,
+    var(--cf-purple-800) 62%,
+    var(--cf-purple-700) 100%
+  );
+
+  color: #fff;
+  padding: 3.5rem 1.5rem 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.cf-hero::after {
+  content: '';
+  position: absolute;
+  right: -6rem;
+  top: -6rem;
+  width: 20rem;
+  height: 20rem;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+}
+
+.cf-hero-inner {
+  max-width: 46rem;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.cf-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: clamp(2rem, 4.4vw, 2.9rem);
+  line-height: 1.12;
+  margin: 0 0 0.9rem;
+  max-width: 30rem;
+}
+
+.cf-hero p {
+  font-size: 1.03rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 34rem;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .cf-hero {
+    padding: 2.75rem 1.25rem 2.25rem;
+  }
+}

@@ -1,0 +1,87 @@
+.cf-done {
+  padding: 2.5rem 0;
+}
+
+.cf-done h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 1.7rem;
+  margin: 0 0 0.6rem;
+}
+
+.cf-done > p {
+  color: var(--cf-ink-600);
+  line-height: 1.6;
+  max-width: 34rem;
+  margin: 0 0 1.5rem;
+}
+
+.cf-sent-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 999px;
+  background: var(--cf-success-bg);
+  color: var(--cf-success);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.cf-sent-plan {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border: 1px solid var(--cf-line);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.cf-sent-plan .cf-section-head {
+  margin-bottom: 1rem;
+}
+
+.cf-advisor-note {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 1.2rem;
+  padding: 0.9rem 1rem;
+  border-left: 2px solid var(--cf-purple-700);
+  background: var(--cf-purple-100);
+}
+
+.cf-advisor-note strong {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--cf-purple-700);
+}
+
+.cf-advisor-note span {
+  font-size: 0.9rem;
+  color: var(--cf-ink-900);
+}
+
+.cf-restart-btn {
+  margin-top: 1.2rem;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 0.6rem 1.3rem;
+  border-radius: 4px;
+  border: 1px solid var(--cf-purple-700);
+  background: none;
+  color: var(--cf-purple-700);
+  cursor: pointer;
+}
+
+.cf-restart-btn:hover {
+  background: var(--cf-purple-100);
+}
+
+@media (max-width: 600px) {
+  .cf-sent-plan {
+    padding: 0.85rem;
+  }
+}

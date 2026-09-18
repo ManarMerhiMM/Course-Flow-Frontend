@@ -1,0 +1,30 @@
+/* Form-only controls. Shared field/input styles live in courseFlowForm.css. */
+
+.cf-submit-btn {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.8rem 1.9rem;
+  border-radius: 4px;
+  border: none;
+  background: var(--cf-purple-700);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cf-submit-btn:hover:not(:disabled) {
+  background: var(--cf-purple-600);
+}
+
+.cf-submit-btn:disabled {
+  background: var(--cf-purple-100);
+  color: var(--cf-ink-600);
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .cf-submit-btn {
+    width: 100%;
+  }
+}
