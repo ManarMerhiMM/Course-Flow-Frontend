@@ -30,6 +30,17 @@ export function normalizePlan(data: unknown): ProposedPlan {
   };
 }
 
+// The per-execution Wait-node link n8n sends alongside the plan:
+//
+// { "courses": [...], "totalCredits": 17, "RespondURL": "..." }
+//
+// Kept separate from the plan so it is never sent back inside "plan".
+export function extractRespondUrl(data: unknown): string | null {
+  const raw = (data ?? {}) as Record<string, unknown>;
+  const url = typeof raw.RespondURL === 'string' ? raw.RespondURL.trim() : '';
+  return url || null;
+}
+
 export async function postJson(url: string, body: unknown): Promise<Response> {
   return fetch(url, {
     method: 'POST',

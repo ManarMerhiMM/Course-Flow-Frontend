@@ -11,15 +11,11 @@ import CourseForm from './CourseForm.tsx';
 import ReviewScreen from './ReviewScreen.tsx';
 import ApprovedScreen from './ApprovedScreen.tsx';
 
-import {
-  SUBMIT_WEBHOOK_URL,
-  REQUEST_CHANGES_WEBHOOK_URL,
-  APPROVE_WEBHOOK_URL,
-} from '../lib/config.ts';
+import { SUBMIT_WEBHOOK_URL } from '../lib/config.ts';
 import { getCollege } from '../lib/majors.ts';
 import { initialState } from '../lib/formState.ts';
 import { computeErrors } from '../lib/validation.ts';
-import { normalizePlan, postJson } from '../lib/plan.ts';
+import { extractRespondUrl, normalizePlan, postJson } from '../lib/plan.ts';
 import type {
   FieldErrors,
   FileKey,
@@ -48,6 +44,10 @@ export default function CourseFlowForm() {
   const [preferenceDraft, setPreferenceDraft] = useState('');
 
   const [plan, setPlan] = useState<ProposedPlan | null>(null);
+
+  // Wait-node link for this workflow execution (from the submit response).
+  // Used for both request_changes and approve.
+  const [respondUrl, setRespondUrl] = useState<string | null>(null);
 
   const [selectedReason, setSelectedReason] = useState('');
 
@@ -284,11 +284,21 @@ export default function CourseFlowForm() {
       //
       // {
       //   "courses": [...],
-      //   "totalCredits": 17
+      //   "totalCredits": 17,
+      //   "RespondURL": "..."
       // }
 
       const data = await response.json();
 
+      const nextRespondUrl = extractRespondUrl(data);
+
+      if (!nextRespondUrl) {
+        throw new Error(
+          'The workflow did not return a RespondURL, so the plan cannot be approved or changed. Please try again.',
+        );
+      }
+
+      setRespondUrl(nextRespondUrl);
       setPlan(normalizePlan(data));
       setSelectedReason('');
       setOtherReason('');
@@ -309,8 +319,10 @@ export default function CourseFlowForm() {
   // -------------------------------------------------------------------------
 
   const handleRequestChanges = async () => {
-    if (!REQUEST_CHANGES_WEBHOOK_URL || !plan) {
-      setErrorMessage('The request-changes workflow is not configured.');
+    if (!respondUrl || !plan) {
+      setErrorMessage(
+        'This plan has no response link from the workflow. Please submit your request again.',
+      );
       return;
     }
 
@@ -353,7 +365,7 @@ export default function CourseFlowForm() {
       //   "feedback": "..."
       // }
 
-      const response = await postJson(REQUEST_CHANGES_WEBHOOK_URL, {
+      const response = await postJson(respondUrl, {
         action: 'request_changes',
         plan,
         feedback,
@@ -367,10 +379,17 @@ export default function CourseFlowForm() {
       //
       // {
       //   "courses": [...],
-      //   "totalCredits": 17
+      //   "totalCredits": 17,
+      //   "RespondURL": "..."   <- optional; if present, replaces the old link
       // }
 
       const data = await response.json();
+
+      const nextRespondUrl = extractRespondUrl(data);
+
+      if (nextRespondUrl) {
+        setRespondUrl(nextRespondUrl);
+      }
 
       setPlan(normalizePlan(data));
 
@@ -392,8 +411,10 @@ export default function CourseFlowForm() {
   // -------------------------------------------------------------------------
 
   const handleApprove = async () => {
-    if (!APPROVE_WEBHOOK_URL || !plan) {
-      setErrorMessage('The approval workflow is not configured.');
+    if (!respondUrl || !plan) {
+      setErrorMessage(
+        'This plan has no response link from the workflow. Please submit your request again.',
+      );
       return;
     }
 
@@ -411,7 +432,7 @@ export default function CourseFlowForm() {
       //   }
       // }
 
-      const response = await postJson(APPROVE_WEBHOOK_URL, {
+      const response = await postJson(respondUrl, {
         action: 'approve',
         plan,
       });
@@ -446,6 +467,7 @@ export default function CourseFlowForm() {
     setSelectedReason('');
     setOtherReason('');
     setPlan(null);
+    setRespondUrl(null);
     setErrorMessage(null);
     setPhase('form');
   };

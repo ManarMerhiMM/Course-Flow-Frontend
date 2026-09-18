@@ -59,10 +59,11 @@ export type Phase = 'form' | 'review' | 'approved';
 //       "credits": 3
 //     }
 //   ],
-//   "totalCredits": 17
+//   "totalCredits": 17,
+//   "RespondURL": "..."   <- Wait-node link, stored separately (see plan.ts)
 // }
 //
-// The same object is sent back to n8n for request_changes and approve.
+// The same object (without RespondURL) is sent back to n8n for request_changes and approve.
 
 export interface PlanCourse {
   code: string;
