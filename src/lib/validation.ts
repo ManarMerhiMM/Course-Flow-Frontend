@@ -6,7 +6,9 @@ import type { FieldErrors, FormState } from './types.ts';
 
 const STUDENT_EMAIL_RE = /^[^\s@]+@students\.rhu\.edu\.lb$/i;
 
-const ADVISOR_EMAIL_RE = /^[^\s@]+@rhu\.edu\.lb$/i;
+// const ADVISOR_EMAIL_RE = /^[^\s@]+@rhu\.edu\.lb$/i;
+
+const ADVISOR_EMAIL_RE = /^[^\s@]+@students\.rhu\.edu\.lb$/i;
 
 // Documents may only be PDF or Word (.docx).
 const ALLOWED_DOCUMENT_EXTENSIONS = ['.pdf', '.docx'];
@@ -76,7 +78,7 @@ export function computeErrors(f: FormState): FieldErrors {
   if (!f.advisorEmail.trim()) {
     next.advisorEmail = "Enter your advisor's email.";
   } else if (!ADVISOR_EMAIL_RE.test(f.advisorEmail.trim())) {
-    next.advisorEmail = 'Must end in @rhu.edu.lb';
+    next.advisorEmail = 'Must end in @students.rhu.edu.lb';
   }
 
   return next;
