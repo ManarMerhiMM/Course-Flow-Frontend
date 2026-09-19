@@ -1,0 +1,743 @@
+{
+  "name": "AI Bootcamp Final",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -2128,
+        640
+      ],
+      "id": "93e940f3-afd3-448a-9c5e-a4dc1bdb16fd",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sdGsw2u2XILercHr",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -896,
+        656
+      ],
+      "id": "89095bdc-5ea7-4b8f-b407-0a0dc9f7344d",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sdGsw2u2XILercHr",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2384,
+        480
+      ],
+      "id": "a38a7e57-2da0-41d6-996b-6a520cbabfbe",
+      "name": "Send All info simultaneously"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14FSW0B0eCdNG3U8GMwm8nUOOUB9yYllAPGdSbxyHLkU",
+          "mode": "list",
+          "cachedResultName": "Course Offerings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14FSW0B0eCdNG3U8GMwm8nUOOUB9yYllAPGdSbxyHLkU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14FSW0B0eCdNG3U8GMwm8nUOOUB9yYllAPGdSbxyHLkU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2784,
+        336
+      ],
+      "id": "16133776-27a9-4dae-a15a-3d824c2dd8db",
+      "name": "Get Offerings from Database",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WWmkghHKQjxWQ6zE",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "offerings",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -2544,
+        336
+      ],
+      "id": "82b08b48-47cf-444c-bf6d-dcabd11c5ab0",
+      "name": "Aggregate Offerings"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "initial-submission",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3008,
+        480
+      ],
+      "id": "a40f11f3-45d7-4dc7-ad73-739cc52b508f",
+      "name": "Student Submits",
+      "webhookId": "e39eb90f-a709-4593-a04b-7ebff7a262fa"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "binaryPropertyName": "studyPlan",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -2784,
+        576
+      ],
+      "id": "45a30924-5b7d-4c42-964b-1c25f6077f9a",
+      "name": "Get Study Plan Data from upload"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "studyPlan",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -2560,
+        576
+      ],
+      "id": "4dee8331-68e9-4015-85da-65983441c9e9",
+      "name": "Aggregate Study Plan Data"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=STUDENT INFO:\nTarget semester: {{ $('Student Submits').first().json.body.semester }} {{ $('Student Submits').first().json.body.year }}\nDegree track: {{ $('Student Submits').first().json.body.degreeTrack }}\nMajor: {{ $('Student Submits').first().json.body.major }}\nCollege: {{ $('Student Submits').first().json.body.college }}\n\nSTUDENT PREFERENCES:\nRequested courses: {{ $('Student Submits').first().json.body.courses }}\nPreferred times: {{ $('Student Submits').first().json.body.preferredTimes }}\nDays to avoid: {{ $('Student Submits').first().json.body.daysToAvoid }}\nOther preferences: {{ $('Student Submits').first().json.body.otherPreferences }}\n\nSTUDY PLAN:\n{{ JSON.stringify($json.studyPlan) }}\n\nCOURSE OFFERINGS:\n{{ JSON.stringify($json.offerings) }}\n\nGenerate the proposed schedule now. Return only the JSON object.",
+        "options": {
+          "systemMessage": "=You are the Academic Course Planning Assistant for Rafik Hariri University's (RHU) CourseFlow system.\n\nYour job is to build a valid proposed schedule for ONE student for ONE target semester, using only the data you are given. You are not the final advisor: an academic advisor reviews every plan you produce, so accuracy matters more than filling every credit.\n\n========================\nINPUT DATA\n========================\n\nThe user message contains:\n\n1. STUDENT INFO: target semester and year, degree track, major, college.\n2. STUDENT PREFERENCES:\n   - requested courses (course codes the student wants included)\n   - preferred times (e.g. Morning, Afternoon)\n   - days to avoid (e.g. Fri, Sat)\n   - other free-text preferences\n3. STUDY PLAN: a JSON list of rows extracted from the student's Excel study plan. Columns:\n   - Course #       (course code, may contain spaces, e.g. \"BMGT 200\"; may be empty for elective placeholders)\n   - Title\n   - Credits\n   - Prerequisites  (may be empty, a course code, several codes, \"Co-req.: X\", \"Junior Standing\", \"Senior Standing\", or \"Placement\")\n   - Status         (\"Completed\" or empty)\n   Some rows are section headings such as \"Year 1, Fall Semester (16 Credits)\". They only indicate where a course sits in the plan; they are not courses.\n4. COURSE OFFERINGS: a JSON list of every section offered in the target semester. Each row is one section, with course code, section, title, credits, faculty, days, start time, end time, room, and remarks.\n   Days use single letters: M = Monday, T = Tuesday, W = Wednesday, R = Thursday, F = Friday, S = Saturday.\n\n========================\nSTUDY PLAN STATUS\n========================\n\n- Status \"Completed\" = the student has passed this course OR is taking it in the current semester (students mark current courses as Completed). Never select it.\n- Empty status = not yet taken. It may be selected if it is offered and all requirements are met.\n\nThe target semester is the NEXT semester, not the current one.\n\n========================\nMATCHING COURSES\n========================\n\n- Compare course codes ignoring spaces and letter case (\"BMGT 200\" = \"BMGT200\").\n- Some courses have a different code in the study plan than in the offerings. If the codes differ but the titles clearly refer to the same course, treat them as the same course and use the OFFERINGS code in your output. Known cases:\n  - BMKT 200 (study plan) = BMKA200 (offerings), Introduction to Marketing\n  - BITM 305 (study plan) = COSC214 (offerings), Introduction to Programming\n  - BITM 401 (study plan) = COSC333 (offerings), Web Programming\n- If a study plan course has no matching offering, it is not available this semester. Skip it.\n\n========================\nPREREQUISITES\n========================\n\nA prerequisite is SATISFIED if that course has status \"Completed\" in the study plan.\nExample: a student taking ENGL 210 now may register for ENGL 217 next semester.\n\n- If a course lists several prerequisites, all must be satisfied, unless they are joined by \"or\", in which case one is enough.\n- \"Co-req.: X\" means X must be satisfied OR selected in the same proposed schedule.\n- \"Placement\" is satisfied for any course that appears in the student's study plan.\n- \"Junior Standing\" is satisfied if every Year 1 course in the study plan is Completed.\n- \"Senior Standing\" is satisfied if every Year 1 and Year 2 course in the study plan is Completed.\n- If a course has no prerequisite listed, do not invent one.\n- Never select a course whose prerequisites are not satisfied, even if the student requested it.\n\n========================\nELECTIVES\n========================\n\nStudy plan rows such as \"Science Elective\", \"Humanities / Fine Arts Elective\", or \"Social Science Elective\" are open slots. You may fill one with an offered course whose Remarks column matches that category (\"Social Science\", \"Humanities\", \"Fine Arts\"). A \"Major Elective\" may be filled with an offered course from the student's own department. Fill an elective only if it has an empty status. Do not use the same course for two elective slots.\n\n========================\nWHICH OFFERINGS ARE ELIGIBLE\n========================\n\nExclude a section if:\n- it has no days or no start/end time (Co-op, summative projects, unscheduled \"Staff\" rows), unless the student explicitly requested that course;\n- its Remarks say it is not open to the student's college or major (e.g. \"Not open for Engineering Students\" for an engineering major);\n- its Remarks say \"Freshman and Remedial Course\" and the course is not in the student's study plan;\n- its Remarks say instructor approval is required and the student did not request it.\n\nLABS: If a course has a lab in the offerings (same code followed by \"L\", e.g. CCEE221 and CCEE221L), select exactly one lecture section AND exactly one lab section. Neither may conflict with anything. If no conflict-free pair exists, drop the course entirely.\n\n========================\nTIME CONFLICTS (STRICT)\n========================\n\nTwo sections conflict if they share at least one day AND their time ranges overlap.\nConvert all times to 24-hour format before comparing. Ranges that touch but do not overlap (one ends 10:45, the next starts 10:45) do not conflict.\n\nExamples:\n- M W 10:00-11:15 and M W 10:30-11:45 → CONFLICT (same days, overlapping)\n- M W 10:00-11:15 and T R 10:00-11:15 → no conflict (no shared day)\n- M 9:30-10:45 and M W 8:00-9:15 → no conflict (no overlap)\n\nBefore answering, check EVERY pair of selected sections. If any pair conflicts, try another section of one of the courses. If no section works, drop the lower-priority course. Never output a schedule with a conflict.\n\n========================\nSECTIONS\n========================\n\n- Never select two sections of the same course (a lecture plus its lab counts as one course).\n- When several sections exist, choose the one that avoids conflicts first, then best matches the student's preferences.\n\n========================\nCREDIT LIMITS\n========================\n\n- Fall and Spring: at most 18 credits.\n- Summer: at most 9 credits.\n- Aim to get as close to the limit as possible using eligible courses, without breaking any other rule. If fewer eligible courses exist, return fewer.\n- totalCredits must equal the exact sum of the credits of the selected sections (labs included).\n\n========================\nSELECTION PRIORITY\n========================\n\nHard rules, which are never broken: offered, not Completed, prerequisites satisfied, no time conflicts, credit limit respected.\n\nWithin the hard rules, prefer in this order:\n1. Unfinished courses from the EARLIEST year/semester of the study plan (catch up on missed courses before moving ahead).\n2. Courses the student explicitly requested.\n3. Courses that are prerequisites for many later courses in the study plan.\n4. Sections in the student's preferred times.\n5. Sections that avoid the student's days to avoid.\n6. The student's other preferences.\n\nPreferences may be broken if the only alternative is dropping a required course. Hard rules may never be broken.\n\n========================\nACCURACY\n========================\n\n- Copy code, section, title, days, times, instructor, room, and credits EXACTLY from the COURSE OFFERINGS row you selected.\n- Never invent a course, section, time, room, instructor, credit value, or prerequisite.\n- If data is ambiguous, choose the safest interpretation, meaning the one least likely to break a hard rule.\n\n========================\nOUTPUT\n========================\n\nReturn ONLY a JSON object, with no markdown, code fences, comments, or other text:\n\n{\n  \"courses\": [\n    {\n      \"code\": \"<code exactly as in offerings>\",\n      \"section\": \"<section exactly as in offerings>\",\n      \"title\": \"<title exactly as in offerings>\",\n      \"days\": \"<days exactly as in offerings, e.g. M W>\",\n      \"time\": \"<start time> - <end time>\",\n      \"instructor\": \"<faculty exactly as in offerings>\",\n      \"room\": \"<room exactly as in offerings>\",\n      \"credits\": <number>\n    }\n  ],\n  \"totalCredits\": <number>\n}\n\nLab sections are separate entries in \"courses\".\nIf no valid course can be selected, return: {\"courses\": [], \"totalCredits\": 0}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -2128,
+        480
+      ],
+      "id": "b3716ce9-038d-4cb7-af83-0a9dcd644a91",
+      "name": "Course Scheduler"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n\"courses\": {{JSON.stringify($json.courses)}},\n\"totalCredits\": {{ $json.totalCredits }},\n\"RespondURL\": \"{{ $json.RespondURL }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -1600,
+        480
+      ],
+      "id": "0cb1b891-35ec-408a-8787-6f42fbfcc56e",
+      "name": "Respond with Initial Schedule"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1312,
+        256
+      ],
+      "id": "d0295328-6cac-4914-9fe1-b0f25645eeda",
+      "name": "Waiting for Student Revision",
+      "webhookId": "95bebd82-fe38-470e-b859-17d69d91885a"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "56717dea-603e-4b3c-89db-37241ae7deb6",
+              "leftValue": "={{ $json.body.action }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1120,
+        256
+      ],
+      "id": "e941d4ec-9106-49ad-804c-d661ab0bf2f0",
+      "name": "Student Approval"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=STUDENT FEEDBACK:\n{{ $input.first().json.body.feedback }}\n\nCURRENT PLAN:\n{{ JSON.stringify($input.first().json.body.plan) }}\n\nSTUDENT INFO:\nTarget semester: {{ $('Student Submits').first().json.body.semester }} {{ $('Student Submits').first().json.body.year }}\nDegree track: {{ $('Student Submits').first().json.body.degreeTrack }}\nMajor: {{ $('Student Submits').first().json.body.major }}\nCollege: {{ $('Student Submits').first().json.body.college }}\n\nSTUDENT PREFERENCES:\nRequested courses: {{ $('Student Submits').first().json.body.courses }}\nPreferred times: {{ $('Student Submits').first().json.body.preferredTimes }}\nDays to avoid: {{ $('Student Submits').first().json.body.daysToAvoid }}\nOther preferences: {{ $('Student Submits').first().json.body.otherPreferences }}\n\nSTUDY PLAN:\n{{ JSON.stringify($('Send All info simultaneously').first().json.studyPlan) }}\n\nCOURSE OFFERINGS:\n{{ JSON.stringify($('Send All info simultaneously').first().json.offerings) }}\n\nReturn the revised plan now.",
+        "options": {
+          "systemMessage": "You are the Academic Course Planning Assistant for Rafik Hariri University's (RHU) CourseFlow system, working in REVISION MODE.\n\nA proposed schedule was already generated for a student. The student reviewed it and asked for changes. Your job is to return a REVISED schedule that addresses the student's feedback while still following every academic rule.\n\nYou are not the final advisor. An academic advisor reviews every plan, so a correct plan matters more than a full one.\n\n========================\nINPUT DATA\n========================\n\nThe user message contains:\n\n1. STUDENT FEEDBACK: the reason the student gave for requesting changes. It is usually one of:\n   - \"I need different courses.\"\n   - \"There is a time conflict.\"\n   - \"The schedule does not match my preferred times.\"\n   - \"The schedule does not match my days-to-avoid preferences.\"\n   - \"I need a different number of credits.\"\n   - or free text written by the student.\n2. CURRENT PLAN: the schedule the student is rejecting (courses + totalCredits).\n3. STUDENT INFO: target semester and year, degree track, major, college.\n4. STUDENT PREFERENCES: requested courses, preferred times, days to avoid, other preferences.\n5. STUDY PLAN: JSON rows from the student's Excel study plan with columns Course #, Title, Credits, Prerequisites, Status (\"Completed\" or empty). \"Completed\" means the student has passed the course OR is taking it in the current semester. Rows like \"Year 1, Fall Semester (16 Credits)\" are headings, not courses.\n6. COURSE OFFERINGS: JSON rows, one per section offered in the target semester (code, section, title, credits, faculty, days, start time, end time, room, remarks).\n   Days: M = Monday, T = Tuesday, W = Wednesday, R = Thursday, F = Friday, S = Saturday.\n\n========================\nHOW TO REVISE\n========================\n\n1. Start from the CURRENT PLAN. Keep every course that is valid and not related to the feedback.\n2. Change only what the feedback requires. Prefer the smallest change that solves it:\n   - First try a different SECTION of the same course.\n   - Only if no section works, replace the course with another eligible course.\n   - Only if no replacement works, drop the course.\n3. Interpret the standard feedback reasons as follows:\n   - \"I need different courses.\" → Replace one or more courses with other eligible courses from the study plan. If the free text names specific courses to add or remove, do exactly that.\n   - \"There is a time conflict.\" → Find every pair of overlapping sections in the current plan and fix each conflict, preferably by switching sections.\n   - \"The schedule does not match my preferred times.\" → Move courses to sections within the preferred times (Morning = starts before 12:00 PM, Afternoon = starts at or after 12:00 PM).\n   - \"The schedule does not match my days-to-avoid preferences.\" → Move courses off the days to avoid, by switching sections or replacing courses.\n   - \"I need a different number of credits.\" → Unless the text says otherwise, assume the student wants more credits if the current total is below the limit, and fewer if it is at the limit.\n   - Free text → Follow the student's request as closely as the rules allow.\n4. The revised plan must differ from the current plan. Return the current plan unchanged only if no valid change exists.\n5. If the student asks for something that breaks a rule (a course with a missing prerequisite, a course not offered, a completed course, a section that does not exist, more than the credit limit), do NOT break the rule. Make the closest valid change instead.\n\n========================\nACADEMIC RULES (NEVER BROKEN)\n========================\n\nEvery course in the revised plan must satisfy ALL of these, including courses kept from the current plan. If a kept course breaks a rule, fix or remove it.\n\nOFFERED: The section must exist in COURSE OFFERINGS. Compare codes ignoring spaces and case (\"BMGT 200\" = \"BMGT200\"). Known code differences between study plan and offerings:\n- BMKT 200 = BMKA200 (Introduction to Marketing)\n- BITM 305 = COSC214 (Introduction to Programming)\n- BITM 401 = COSC333 (Web Programming)\nAlways output the OFFERINGS code.\n\nSTATUS: Never select a course whose study plan status is \"Completed\".\n\nPREREQUISITES: A prerequisite is satisfied if that course has status \"Completed\" in the study plan.\nExample: a student currently taking ENGL 210 marks it Completed, so ENGL 217 (which requires ENGL 210) may be selected.\n- Several prerequisites must all be satisfied, unless joined by \"or\".\n- \"Co-req.: X\" means X is satisfied or selected in the same plan.\n- \"Placement\" is satisfied for any course in the student's study plan.\n- \"Junior Standing\" is satisfied if every Year 1 course is Completed.\n- \"Senior Standing\" is satisfied if every Year 1 and Year 2 course is Completed.\n- Never invent a prerequisite.\n\nELIGIBLE SECTIONS: Exclude sections with no days or times (unless the student explicitly requested that course), sections whose Remarks exclude the student's college or major, \"Freshman and Remedial Course\" sections not in the study plan, and instructor-approval sections the student did not request.\n\nELECTIVES: Elective rows in the study plan (\"Social Science Elective\", \"Humanities / Fine Arts Elective\", etc.) may be filled with an offered course whose Remarks match that category. One course per slot.\n\nLABS: If a course has a lab (same code + \"L\", e.g. CCEE221 and CCEE221L), include exactly one lecture section and exactly one lab section, or neither.\n\nSECTIONS: Never include two sections of the same course.\n\nTIME CONFLICTS: Two sections conflict if they share at least one day AND their times overlap. Convert times to 24-hour format before comparing. Touching ranges (one ends 10:45, the next starts 10:45) do not conflict. Check EVERY pair in the revised plan before answering.\n\nCREDIT LIMIT: At most 18 credits in Fall and Spring, 9 in Summer. totalCredits must equal the exact sum of the selected sections' credits (labs included).\n\n========================\nPRIORITIES WHEN CHOOSING REPLACEMENTS\n========================\n\nWithin the rules above, prefer:\n1. What the student's feedback asks for.\n2. Unfinished courses from the earliest year/semester of the study plan.\n3. Courses the student originally requested.\n4. Courses that are prerequisites for many later courses.\n5. Sections in preferred times and not on days to avoid.\n\n========================\nACCURACY\n========================\n\n- Copy code, section, title, days, times, instructor, room, and credits EXACTLY from the COURSE OFFERINGS row you selected, even for courses kept from the current plan.\n- Never invent any course, section, time, room, instructor, credit value, or prerequisite.\n- If data is ambiguous, choose the interpretation least likely to break a rule.\n\n========================\nOUTPUT\n========================\n\nReturn ONLY a JSON object, with no markdown, code fences, comments, explanations, or other text:\n\n{\n  \"courses\": [\n    {\n      \"code\": \"<code exactly as in offerings>\",\n      \"section\": \"<section exactly as in offerings>\",\n      \"title\": \"<title exactly as in offerings>\",\n      \"days\": \"<days exactly as in offerings, e.g. M W>\",\n      \"time\": \"<start time> - <end time>\",\n      \"instructor\": \"<faculty exactly as in offerings>\",\n      \"room\": \"<room exactly as in offerings>\",\n      \"credits\": <number>\n    }\n  ],\n  \"totalCredits\": <number>\n}\n\nLab sections are separate entries in \"courses\".\nIf no valid course can be selected, return: {\"courses\": [], \"totalCredits\": 0}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -896,
+        480
+      ],
+      "id": "307ddcfa-4be6-433d-8267-8fc5163677a3",
+      "name": "Schedule Reviser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -448,
+        688
+      ],
+      "id": "c7382036-a41e-4d35-801c-e8c08320d00d",
+      "name": "Respond with Updated Schedule"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Good to Go",
+            "disapproveLabel": "Need a Meeting"
+          }
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        96
+      ],
+      "id": "6d4f8ab4-7d87-40ab-8ad5-c154875d8a5a",
+      "name": "Email the Advisor ",
+      "webhookId": "fdc9c6c9-bdb6-4615-94a9-1e9165b784ce",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "R4MBf6OJ5j9mvLCK",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0c26363e-eecd-4257-9ced-2618fb73ea53",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        96
+      ],
+      "id": "4821b24f-cfe0-4cfb-a392-19e04c692433",
+      "name": "Advisor Approval"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { ...JSON.parse($json.output.replace(/```json|```/g, '').trim()), RespondURL: $execution.resumeUrl } }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -624,
+        688
+      ],
+      "id": "6957e91a-50fc-4703-83d0-fc370aeb255b",
+      "name": "Parse Revised Plan"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"sent_to_advisor\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -896,
+        96
+      ],
+      "id": "0f387c4a-e4db-4394-972a-2a9d653f1fb5",
+      "name": "Respond to Student (Approved)"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { ...JSON.parse($json.output.replace(/```json|```/g, '').trim()), RespondURL: $execution.resumeUrl } }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1824,
+        480
+      ],
+      "id": "b856c181-0684-4644-8444-5af4a36ccb50",
+      "name": "Parse Plan"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "358b8959-5859-4d19-8920-1c61a56afd9b",
+      "name": "Send Approval Message to Student with the plan",
+      "webhookId": "e678c59f-68ca-4f74-b75e-2c7bf4174497",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "R4MBf6OJ5j9mvLCK",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        240
+      ],
+      "id": "844cb0bf-b393-489b-9be9-48b93947f680",
+      "name": "Send Disapproval Message to Student",
+      "webhookId": "e678c59f-68ca-4f74-b75e-2c7bf4174497",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "R4MBf6OJ5j9mvLCK",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const plan = $('Waiting for Student Revision').first().json.body.plan;\nconst s = $('Student Submits').first().json.body;\n\n// ---------- helpers ----------\nconst esc = (v) => String(v ?? '')\n  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst tidyTime = (t) => esc(t).replace(/(\\d{1,2}:\\d{2}):00/g, '$1');\nconst firstName = esc(String(s.fullName ?? '').trim().split(/\\s+/)[0] || 'Student');\n\n// ---------- course table (same design as the advisor email) ----------\nconst hasSection = plan.courses.some(c => c.section);\n\nconst th = (label, align = 'left') =>\n  `<th style=\"background:#1f3a5f;color:#ffffff;padding:10px 12px;text-align:${align};\n   font-size:13px;font-weight:600;border-bottom:2px solid #16304f;\">${label}</th>`;\n\nconst td = (value, i, align = 'left', bold = false) =>\n  `<td style=\"padding:10px 12px;font-size:13px;color:#1f2933;text-align:${align};\n   background:${i % 2 ? '#f4f7fb' : '#ffffff'};border-bottom:1px solid #e3e8ef;\n   ${bold ? 'font-weight:600;' : ''}\">${value}</td>`;\n\nconst rows = plan.courses.map((c, i) => `\n  <tr>\n    ${td(esc(c.code), i, 'left', true)}\n    ${hasSection ? td(esc(c.section), i, 'center') : ''}\n    ${td(esc(c.title), i)}\n    ${td(esc(c.days), i, 'center')}\n    ${td(tidyTime(c.time), i)}\n    ${td(esc(c.instructor), i)}\n    ${td(esc(c.room), i, 'center')}\n    ${td(esc(c.credits), i, 'center')}\n  </tr>`).join('');\n\nconst colCount = hasSection ? 8 : 7;\n\nconst courseTable = `\n  <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"\n         style=\"border-collapse:collapse;border:1px solid #e3e8ef;\">\n    <tr>\n      ${th('Code')}\n      ${hasSection ? th('Sec.', 'center') : ''}\n      ${th('Course Title')}\n      ${th('Days', 'center')}\n      ${th('Time')}\n      ${th('Instructor')}\n      ${th('Room', 'center')}\n      ${th('Cr.', 'center')}\n    </tr>\n    ${rows}\n    <tr>\n      <td colspan=\"${colCount - 1}\" style=\"padding:12px;font-size:13px;font-weight:700;\n          text-align:right;background:#e8eef6;\">Total Credits</td>\n      <td style=\"padding:12px;font-size:14px;font-weight:700;text-align:center;\n          background:#e8eef6;color:#1f3a5f;\">${esc(plan.totalCredits)}</td>\n    </tr>\n  </table>\n  <p style=\"font-size:12px;color:#6b7785;margin-top:10px;\">\n    Days: M = Monday, T = Tuesday, W = Wednesday, R = Thursday, F = Friday.\n  </p>`;\n\nconst banner = (bg, border, color, text) => `\n  <div style=\"background:${bg};border-left:4px solid ${border};padding:14px 16px;\n       margin:0 0 20px 0;font-size:15px;font-weight:700;color:${color};\">${text}</div>`;\n\n// ---------- approval email ----------\nconst html = `\n<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:760px;color:#1f2933;\">\n  ${banner('#e7f6ec', '#1e8e3e', '#14632b', '&#10003; Your registration plan has been approved')}\n\n  <p style=\"font-size:14px;\">Dear ${firstName},</p>\n\n  <p style=\"font-size:14px;line-height:1.6;\">\n    Congratulations! Your advisor has reviewed and <b>approved</b> your proposed schedule for\n    <b>${esc(s.semester)} ${esc(s.year)}</b>.\n  </p>\n\n  <p style=\"font-size:14px;line-height:1.6;\">\n    You have been <b>unblocked on RHU SIS</b>, so you can now go ahead and register\n    for the courses below.\n  </p>\n\n  <h3 style=\"font-size:15px;color:#1f3a5f;margin:24px 0 10px 0;\">Your approved schedule</h3>\n  ${courseTable}\n\n  <p style=\"font-size:14px;line-height:1.6;margin-top:20px;\">\n    Please register for these exact sections on SIS as soon as possible, since seats can fill up.\n  </p>\n\n  <p style=\"font-size:14px;line-height:1.6;\">\n    Wishing you a great semester!<br>\n    <b>RHU CourseFlow</b>\n  </p>\n</div>`;\n\nreturn [{\n  json: {\n    to: s.email,\n    subject: `Approved: your ${s.semester} ${s.year} registration plan`,\n    html,\n  },\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "93042ee3-1955-48b3-ba24-5ecf02f3efe7",
+      "name": "Build Approval Email"
+    },
+    {
+      "parameters": {
+        "jsCode": "const plan = $('Waiting for Student Revision').first().json.body.plan;\nconst s = $('Student Submits').first().json.body;\n\n// ---------- helpers ----------\nconst esc = (v) => String(v ?? '')\n  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst tidyTime = (t) => esc(t).replace(/(\\d{1,2}:\\d{2}):00/g, '$1');\nconst firstName = esc(String(s.fullName ?? '').trim().split(/\\s+/)[0] || 'Student');\n\n// ---------- course table (same design as the advisor email) ----------\nconst hasSection = plan.courses.some(c => c.section);\n\nconst th = (label, align = 'left') =>\n  `<th style=\"background:#1f3a5f;color:#ffffff;padding:10px 12px;text-align:${align};\n   font-size:13px;font-weight:600;border-bottom:2px solid #16304f;\">${label}</th>`;\n\nconst td = (value, i, align = 'left', bold = false) =>\n  `<td style=\"padding:10px 12px;font-size:13px;color:#1f2933;text-align:${align};\n   background:${i % 2 ? '#f4f7fb' : '#ffffff'};border-bottom:1px solid #e3e8ef;\n   ${bold ? 'font-weight:600;' : ''}\">${value}</td>`;\n\nconst rows = plan.courses.map((c, i) => `\n  <tr>\n    ${td(esc(c.code), i, 'left', true)}\n    ${hasSection ? td(esc(c.section), i, 'center') : ''}\n    ${td(esc(c.title), i)}\n    ${td(esc(c.days), i, 'center')}\n    ${td(tidyTime(c.time), i)}\n    ${td(esc(c.instructor), i)}\n    ${td(esc(c.room), i, 'center')}\n    ${td(esc(c.credits), i, 'center')}\n  </tr>`).join('');\n\nconst colCount = hasSection ? 8 : 7;\n\nconst courseTable = `\n  <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"\n         style=\"border-collapse:collapse;border:1px solid #e3e8ef;\">\n    <tr>\n      ${th('Code')}\n      ${hasSection ? th('Sec.', 'center') : ''}\n      ${th('Course Title')}\n      ${th('Days', 'center')}\n      ${th('Time')}\n      ${th('Instructor')}\n      ${th('Room', 'center')}\n      ${th('Cr.', 'center')}\n    </tr>\n    ${rows}\n    <tr>\n      <td colspan=\"${colCount - 1}\" style=\"padding:12px;font-size:13px;font-weight:700;\n          text-align:right;background:#e8eef6;\">Total Credits</td>\n      <td style=\"padding:12px;font-size:14px;font-weight:700;text-align:center;\n          background:#e8eef6;color:#1f3a5f;\">${esc(plan.totalCredits)}</td>\n    </tr>\n  </table>\n  <p style=\"font-size:12px;color:#6b7785;margin-top:10px;\">\n    Days: M = Monday, T = Tuesday, W = Wednesday, R = Thursday, F = Friday.\n  </p>`;\n\nconst banner = (bg, border, color, text) => `\n  <div style=\"background:${bg};border-left:4px solid ${border};padding:14px 16px;\n       margin:0 0 20px 0;font-size:15px;font-weight:700;color:${color};\">${text}</div>`;\n\n// ---------- disapproval email ----------\nconst html = `\n<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:760px;color:#1f2933;\">\n  ${banner('#fdecea', '#c5221f', '#8c1d18', 'Your registration plan was not approved')}\n\n  <p style=\"font-size:14px;\">Dear ${firstName},</p>\n\n  <p style=\"font-size:14px;line-height:1.6;\">\n    Unfortunately, the plan you proposed earlier for <b>${esc(s.semester)} ${esc(s.year)}</b>\n    did not get accepted by your advisor.\n  </p>\n\n  <h3 style=\"font-size:15px;color:#1f3a5f;margin:24px 0 10px 0;\">The plan you proposed</h3>\n  ${courseTable}\n\n  <p style=\"font-size:14px;line-height:1.6;margin-top:20px;\">\n    You are <b>still blocked on RHU SIS</b>. To move forward, you can:\n  </p>\n  <ul style=\"font-size:14px;line-height:1.7;margin-top:0;\">\n    <li>Schedule a meeting with your advisor\n        (<a href=\"mailto:${esc(s.advisorEmail)}\" style=\"color:#1f3a5f;\">${esc(s.advisorEmail)}</a>)\n        to discuss your plan, or</li>\n    <li>Submit another approval request on CourseFlow with a new schedule.</li>\n  </ul>\n\n  <p style=\"font-size:14px;line-height:1.6;\">\n    Kind regards,<br>\n    <b>RHU CourseFlow</b>\n  </p>\n</div>`;\n\nreturn [{\n  json: {\n    to: s.email,\n    subject: `Action needed: your ${s.semester} ${s.year} registration plan was not approved`,\n    html,\n  },\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        240
+      ],
+      "id": "b56331b9-fde6-43cf-a56a-aafe5a7ee5b8",
+      "name": "Build Disapproval Email"
+    },
+    {
+      "parameters": {
+        "jsCode": "const plan = $('Waiting for Student Revision').first().json.body.plan;\nconst s = $('Student Submits').first().json.body;\n\n// Escape text so names/titles can't break the HTML\nconst esc = (v) => String(v ?? '')\n  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\n\n// \"8:00:00 AM\" -> \"8:00 AM\"\nconst tidyTime = (t) => esc(t).replace(/(\\d{1,2}:\\d{2}):00/g, '$1');\n\nconst hasSection = plan.courses.some(c => c.section);\n\nconst th = (label, align = 'left') =>\n  `<th style=\"background:#1f3a5f;color:#ffffff;padding:10px 12px;text-align:${align};\n   font-size:13px;font-weight:600;border-bottom:2px solid #16304f;\">${label}</th>`;\n\nconst td = (value, i, align = 'left', bold = false) =>\n  `<td style=\"padding:10px 12px;font-size:13px;color:#1f2933;text-align:${align};\n   background:${i % 2 ? '#f4f7fb' : '#ffffff'};border-bottom:1px solid #e3e8ef;\n   ${bold ? 'font-weight:600;' : ''}\">${value}</td>`;\n\nconst rows = plan.courses.map((c, i) => `\n  <tr>\n    ${td(esc(c.code), i, 'left', true)}\n    ${hasSection ? td(esc(c.section), i, 'center') : ''}\n    ${td(esc(c.title), i)}\n    ${td(esc(c.days), i, 'center')}\n    ${td(tidyTime(c.time), i)}\n    ${td(esc(c.instructor), i)}\n    ${td(esc(c.room), i, 'center')}\n    ${td(esc(c.credits), i, 'center')}\n  </tr>`).join('');\n\nconst colCount = hasSection ? 8 : 7;\n\nconst info = (label, value) => `\n  <tr>\n    <td style=\"padding:4px 12px 4px 0;font-size:13px;color:#6b7785;\">${label}</td>\n    <td style=\"padding:4px 0;font-size:13px;color:#1f2933;font-weight:600;\">${esc(value)}</td>\n  </tr>`;\n\nconst html = `\n<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:760px;color:#1f2933;\">\n  <p style=\"font-size:14px;\">Hello Doctor,</p>\n  <p style=\"font-size:14px;\">\n    The following student has approved a proposed schedule for\n    <b>${esc(s.semester)} ${esc(s.year)}</b> and is requesting your approval.\n  </p>\n\n  <table cellpadding=\"0\" cellspacing=\"0\" style=\"margin:16px 0 20px 0;\">\n    ${info('Student', s.fullName)}\n    ${info('Student ID', s.studentId)}\n    ${info('Major', s.major)}\n    ${info('College', s.college)}\n    ${info('Email', s.email)}\n    ${info('Mobile', s.mobile)}\n  </table>\n\n  <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"\n         style=\"border-collapse:collapse;border:1px solid #e3e8ef;\">\n    <tr>\n      ${th('Code')}\n      ${hasSection ? th('Sec.', 'center') : ''}\n      ${th('Course Title')}\n      ${th('Days', 'center')}\n      ${th('Time')}\n      ${th('Instructor')}\n      ${th('Room', 'center')}\n      ${th('Cr.', 'center')}\n    </tr>\n    ${rows}\n    <tr>\n      <td colspan=\"${colCount - 1}\" style=\"padding:12px;font-size:13px;font-weight:700;\n          text-align:right;background:#e8eef6;\">Total Credits</td>\n      <td style=\"padding:12px;font-size:14px;font-weight:700;text-align:center;\n          background:#e8eef6;color:#1f3a5f;\">${esc(plan.totalCredits)}</td>\n    </tr>\n  </table>\n\n  <p style=\"font-size:12px;color:#6b7785;margin-top:16px;\">\n    Days: M = Monday, T = Tuesday, W = Wednesday, R = Thursday, F = Friday.\n  </p>\n  <p style=\"font-size:14px;\">Please approve or disapprove this schedule using the buttons below.</p>\n</div>`;\n\nreturn [{\n  json: {\n    to: s.advisorEmail,\n    subject: `Registration approval: ${s.fullName} (${s.studentId}), ${s.semester} ${s.year}`,\n    html,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -672,
+        96
+      ],
+      "id": "61f801a4-9a66-466d-a1cf-ae8090131e67",
+      "name": "Build Advisor Email"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Course Scheduler",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Schedule Reviser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send All info simultaneously": {
+      "main": [
+        [
+          {
+            "node": "Course Scheduler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Offerings from Database": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Offerings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Offerings": {
+      "main": [
+        [
+          {
+            "node": "Send All info simultaneously",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Student Submits": {
+      "main": [
+        [
+          {
+            "node": "Get Offerings from Database",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Study Plan Data from upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Study Plan Data from upload": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Study Plan Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Study Plan Data": {
+      "main": [
+        [
+          {
+            "node": "Send All info simultaneously",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Course Scheduler": {
+      "main": [
+        [
+          {
+            "node": "Parse Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond with Initial Schedule": {
+      "main": [
+        [
+          {
+            "node": "Waiting for Student Revision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Waiting for Student Revision": {
+      "main": [
+        [
+          {
+            "node": "Student Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Student Approval": {
+      "main": [
+        [
+          {
+            "node": "Respond to Student (Approved)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Schedule Reviser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Reviser": {
+      "main": [
+        [
+          {
+            "node": "Parse Revised Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond with Updated Schedule": {
+      "main": [
+        [
+          {
+            "node": "Waiting for Student Revision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email the Advisor ": {
+      "main": [
+        [
+          {
+            "node": "Advisor Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Revised Plan": {
+      "main": [
+        [
+          {
+            "node": "Respond with Updated Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Student (Approved)": {
+      "main": [
+        [
+          {
+            "node": "Build Advisor Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Plan": {
+      "main": [
+        [
+          {
+            "node": "Respond with Initial Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Advisor Approval": {
+      "main": [
+        [
+          {
+            "node": "Build Approval Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Disapproval Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Approval Email": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Message to Student with the plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Disapproval Email": {
+      "main": [
+        [
+          {
+            "node": "Send Disapproval Message to Student",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Advisor Email": {
+      "main": [
+        [
+          {
+            "node": "Email the Advisor ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f5828977-a04c-4f41-b50a-ff6d3dd6b682",
+  "meta": {
+    "instanceId": "33d6f2f21f49054563ea6ffbd8b8bb5738c1dcd2f730d14d72998fc5b3cfc1f8"
+  },
+  "nodeGroups": [],
+  "id": "uqBKrKtHNZrwNypC",
+  "tags": []
+}
