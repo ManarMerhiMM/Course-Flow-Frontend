@@ -4,7 +4,9 @@
 
 **RHU Course Flow** turns Rafik Hariri University's semester registration, usually a back-and-forth of emails, meetings, and schedule conflicts, into a single guided loop. A React frontend collects the student's information and study plan, and an **n8n** workflow powered by **Google Gemini** builds a proposed schedule from the live course offerings. The student reviews and revises the plan, and the advisor approves or rejects it straight from their inbox.
 
-![n8n workflow](Screenshots/n8n-workflow.png)
+> Hosted at: https://course-flow-frontend-gules.vercel.app/
+
+![n8n workflow](Screenshots/n8n-Workflow.png)
 
 ---
 
